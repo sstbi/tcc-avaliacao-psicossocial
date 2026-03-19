@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Empresas{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Empresas</h2>
+    <a href="{{ url_for('main.nova_empresa') }}" class="btn btn-success">Nova Empresa</a>
+</div>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Razão Social</th>
+            <th>Nome Fantasia</th>
+            <th>CNPJ</th>
+            <th>Responsável</th>
+            <th>Status</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for empresa in empresas %}
+        <tr>
+            <td>{{ empresa.id }}</td>
+            <td>{{ empresa.razao_social }}</td>
+            <td>{{ empresa.nome_fantasia }}</td>
+            <td>{{ empresa.cnpj }}</td>
+            <td>{{ empresa.responsavel }}</td>
+            <td>{{ empresa.status }}</td>
+            <td>
+                <a href="{{ url_for('main.editar_empresa', id=empresa.id) }}" class="btn btn-sm btn-primary">Editar</a>
+
+                {% if empresa.status != 'Inativa' %}
+                <form action="{{ url_for('main.inativar_empresa', id=empresa.id) }}"
+                      method="post"
+                      class="d-inline"
+                      onsubmit="return confirm('Tem certeza que deseja inativar esta empresa?');">
+                    <button type="submit" class="btn btn-sm btn-warning">Inativar</button>
+                </form>
+                {% endif %}
+            </td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="7" class="text-center">Nenhuma empresa cadastrada.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
