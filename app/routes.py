@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from app import db
-from app.models import Empresa, Unidade
+from app.models import Empresa, Unidade, Setor
 
 main = Blueprint("main", __name__)
 
@@ -120,3 +120,72 @@ def inativar_unidade(id):
 
     flash("Unidade inativada com sucesso!", "warning")
     return redirect(url_for("main.listar_unidades"))
+
+
+# =========================
+# SETORES
+# =========================
+@main.route("/setores")
+def listar_setores():
+    setores = Setor.query.order_by(Setor.id.desc()).all()
+    return render_template("setores/listar.html", setores=setores)
+
+@main.route("/setores/novo", methods=["GET", "POST"])
+def novo_setor():
+    empresas = Empresa.query.filter_by(status="Ativa").order_by(Empresa.razao_social.asc()).all()
+    unidades = Unidade.query.filter_by(status="Ativa").order_by(Unidade.nome.asc()).all()
+
+    if request.method == "POST":
+        unidade_id = request.form.get("unidade_id")
+
+        if unidade_id == "":
+            unidade_id = None
+
+        setor = Setor(
+            empresa_id=request.form["empresa_id"],
+            unidade_id=unidade_id,
+            nome=request.form["nome"],
+            descricao=request.form["descricao"],
+            status=request.form["status"]
+        )
+        db.session.add(setor)
+        db.session.commit()
+
+        flash("Setor cadastrado com sucesso!", "success")
+        return redirect(url_for("main.listar_setores"))
+
+    return render_template("setores/novo.html", empresas=empresas, unidades=unidades)
+
+@main.route("/setores/<int:id>/editar", methods=["GET", "POST"])
+def editar_setor(id):
+    setor = Setor.query.get_or_404(id)
+    empresas = Empresa.query.filter_by(status="Ativa").order_by(Empresa.razao_social.asc()).all()
+    unidades = Unidade.query.filter_by(status="Ativa").order_by(Unidade.nome.asc()).all()
+
+    if request.method == "POST":
+        unidade_id = request.form.get("unidade_id")
+
+        if unidade_id == "":
+            unidade_id = None
+
+        setor.empresa_id = request.form["empresa_id"]
+        setor.unidade_id = unidade_id
+        setor.nome = request.form["nome"]
+        setor.descricao = request.form["descricao"]
+        setor.status = request.form["status"]
+
+        db.session.commit()
+
+        flash("Setor atualizado com sucesso!", "success")
+        return redirect(url_for("main.listar_setores"))
+
+    return render_template("setores/editar.html", setor=setor, empresas=empresas, unidades=unidades)
+
+@main.route("/setores/<int:id>/inativar", methods=["POST"])
+def inativar_setor(id):
+    setor = Setor.query.get_or_404(id)
+    setor.status = "Inativa"
+    db.session.commit()
+
+    flash("Setor inativado com sucesso!", "warning")
+    return redirect(url_for("main.listar_setores"))
