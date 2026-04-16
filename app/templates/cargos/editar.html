@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Cargo{% endblock %}
+
+{% block content %}
+<h2>Editar Cargo</h2>
+
+<form method="post" class="mt-3">
+    <div class="mb-3">
+        <label class="form-label">Empresa</label>
+        <select name="empresa_id" class="form-select" required>
+            {% for empresa in empresas %}
+            <option value="{{ empresa.id }}" {% if empresa.id == cargo.empresa_id %}selected{% endif %}>
+                {{ empresa.razao_social }}
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Unidade</label>
+        <select name="unidade_id" class="form-select">
+            <option value="">Sem unidade vinculada</option>
+            {% for unidade in unidades %}
+            <option value="{{ unidade.id }}" {% if cargo.unidade_id == unidade.id %}selected{% endif %}>
+                {{ unidade.nome }} - {{ unidade.empresa.razao_social }}
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Setor</label>
+        <select name="setor_id" class="form-select">
+            <option value="">Sem setor vinculado</option>
+            {% for setor in setores %}
+            <option value="{{ setor.id }}" {% if cargo.setor_id == setor.id %}selected{% endif %}>
+                {{ setor.nome }} - {{ setor.empresa.razao_social }}
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Nome do Cargo</label>
+        <input type="text" name="nome" class="form-control" value="{{ cargo.nome }}" required>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Descrição</label>
+        <input type="text" name="descricao" class="form-control" value="{{ cargo.descricao or '' }}">
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Status</label>
+        <select name="status" class="form-select">
+            <option value="Ativa" {% if cargo.status == 'Ativa' %}selected{% endif %}>Ativa</option>
+            <option value="Inativa" {% if cargo.status == 'Inativa' %}selected{% endif %}>Inativa</option>
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Atualizar</button>
+    <a href="{{ url_for('main.listar_cargos') }}" class="btn btn-secondary">Voltar</a>
+</form>
+{% endblock %}

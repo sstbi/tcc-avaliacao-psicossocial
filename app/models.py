@@ -1,6 +1,7 @@
 from datetime import datetime
 from app import db
 
+
 class Empresa(db.Model):
     __tablename__ = "empresas"
 
@@ -50,3 +51,23 @@ class Setor(db.Model):
 
     def __repr__(self):
         return f"<Setor {self.nome}>"
+
+
+class Cargo(db.Model):
+    __tablename__ = "cargos"
+
+    id = db.Column(db.Integer, primary_key=True)
+    empresa_id = db.Column(db.Integer, db.ForeignKey("empresas.id"), nullable=False)
+    unidade_id = db.Column(db.Integer, db.ForeignKey("unidades.id"), nullable=True)
+    setor_id = db.Column(db.Integer, db.ForeignKey("setores.id"), nullable=True)
+    nome = db.Column(db.String(150), nullable=False)
+    descricao = db.Column(db.String(255), nullable=True)
+    status = db.Column(db.String(20), nullable=False, default="Ativa")
+    criado_em = db.Column(db.DateTime, default=datetime.utcnow)
+
+    empresa = db.relationship("Empresa", backref="cargos")
+    unidade = db.relationship("Unidade", backref="cargos")
+    setor = db.relationship("Setor", backref="cargos")
+
+    def __repr__(self):
+        return f"<Cargo {self.nome}>"

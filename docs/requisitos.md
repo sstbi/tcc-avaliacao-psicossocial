@@ -12,6 +12,14 @@ Desenvolver um sistema web para apoio à gestão da avaliação psicossocial ocu
 - RF06: Listar unidades cadastradas
 - RF07: Editar dados de unidades
 - RF08: Inativar unidades
+- RF09: Cadastrar setores vinculados às empresas
+- RF10: Listar setores cadastrados
+- RF11: Editar dados de setores
+- RF12: Inativar setores
+- RF13: Cadastrar cargos vinculados às empresas
+- RF14: Listar cargos cadastrados
+- RF15: Editar dados de cargos
+- RF16: Inativar cargos
 
 ## Requisitos Não Funcionais
 - O sistema deverá ser web

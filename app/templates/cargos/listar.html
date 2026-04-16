@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Cargos{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Cargos</h2>
+    <a href="{{ url_for('main.novo_cargo') }}" class="btn btn-success">Novo Cargo</a>
+</div>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Empresa</th>
+            <th>Unidade</th>
+            <th>Setor</th>
+            <th>Nome</th>
+            <th>Descrição</th>
+            <th>Status</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for cargo in cargos %}
+        <tr>
+            <td>{{ cargo.id }}</td>
+            <td>{{ cargo.empresa.razao_social }}</td>
+            <td>{{ cargo.unidade.nome if cargo.unidade else '' }}</td>
+            <td>{{ cargo.setor.nome if cargo.setor else '' }}</td>
+            <td>{{ cargo.nome }}</td>
+            <td>{{ cargo.descricao or '' }}</td>
+            <td>{{ cargo.status }}</td>
+            <td>
+                <a href="{{ url_for('main.editar_cargo', id=cargo.id) }}" class="btn btn-sm btn-primary">Editar</a>
+
+                {% if cargo.status != 'Inativa' %}
+                <form action="{{ url_for('main.inativar_cargo', id=cargo.id) }}"
+                      method="post"
+                      class="d-inline"
+                      onsubmit="return confirm('Tem certeza que deseja inativar este cargo?');">
+                    <button type="submit" class="btn btn-sm btn-warning">Inativar</button>
+                </form>
+                {% endif %}
+            </td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="8" class="text-center">Nenhum cargo cadastrado.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
