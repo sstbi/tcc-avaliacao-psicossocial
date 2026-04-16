@@ -1,8 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from app import db
-from app.models import Empresa
-
-# teste commit
+from app.models import Empresa, Unidade
 
 main = Blueprint("main", __name__)
 
@@ -10,6 +8,10 @@ main = Blueprint("main", __name__)
 def index():
     return render_template("index.html")
 
+
+# =========================
+# EMPRESAS
+# =========================
 @main.route("/empresas")
 def listar_empresas():
     empresas = Empresa.query.order_by(Empresa.id.desc()).all()
@@ -63,3 +65,58 @@ def inativar_empresa(id):
 
     flash("Empresa inativada com sucesso!", "warning")
     return redirect(url_for("main.listar_empresas"))
+
+
+# =========================
+# UNIDADES
+# =========================
+@main.route("/unidades")
+def listar_unidades():
+    unidades = Unidade.query.order_by(Unidade.id.desc()).all()
+    return render_template("unidades/listar.html", unidades=unidades)
+
+@main.route("/unidades/nova", methods=["GET", "POST"])
+def nova_unidade():
+    empresas = Empresa.query.filter_by(status="Ativa").order_by(Empresa.razao_social.asc()).all()
+
+    if request.method == "POST":
+        unidade = Unidade(
+            empresa_id=request.form["empresa_id"],
+            nome=request.form["nome"],
+            descricao=request.form["descricao"],
+            status=request.form["status"]
+        )
+        db.session.add(unidade)
+        db.session.commit()
+
+        flash("Unidade cadastrada com sucesso!", "success")
+        return redirect(url_for("main.listar_unidades"))
+
+    return render_template("unidades/nova.html", empresas=empresas)
+
+@main.route("/unidades/<int:id>/editar", methods=["GET", "POST"])
+def editar_unidade(id):
+    unidade = Unidade.query.get_or_404(id)
+    empresas = Empresa.query.filter_by(status="Ativa").order_by(Empresa.razao_social.asc()).all()
+
+    if request.method == "POST":
+        unidade.empresa_id = request.form["empresa_id"]
+        unidade.nome = request.form["nome"]
+        unidade.descricao = request.form["descricao"]
+        unidade.status = request.form["status"]
+
+        db.session.commit()
+
+        flash("Unidade atualizada com sucesso!", "success")
+        return redirect(url_for("main.listar_unidades"))
+
+    return render_template("unidades/editar.html", unidade=unidade, empresas=empresas)
+
+@main.route("/unidades/<int:id>/inativar", methods=["POST"])
+def inativar_unidade(id):
+    unidade = Unidade.query.get_or_404(id)
+    unidade.status = "Inativa"
+    db.session.commit()
+
+    flash("Unidade inativada com sucesso!", "warning")
+    return redirect(url_for("main.listar_unidades"))

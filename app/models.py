@@ -16,3 +16,19 @@ class Empresa(db.Model):
 
     def __repr__(self):
         return f"<Empresa {self.razao_social}>"
+
+
+class Unidade(db.Model):
+    __tablename__ = "unidades"
+
+    id = db.Column(db.Integer, primary_key=True)
+    empresa_id = db.Column(db.Integer, db.ForeignKey("empresas.id"), nullable=False)
+    nome = db.Column(db.String(150), nullable=False)
+    descricao = db.Column(db.String(255), nullable=True)
+    status = db.Column(db.String(20), nullable=False, default="Ativa")
+    criado_em = db.Column(db.DateTime, default=datetime.utcnow)
+
+    empresa = db.relationship("Empresa", backref="unidades")
+
+    def __repr__(self):
+        return f"<Unidade {self.nome}>"

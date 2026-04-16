@@ -11,8 +11,9 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container">
             <a class="navbar-brand" href="{{ url_for('main.index') }}">TCC Psicossocial</a>
-            <div>
+            <div class="d-flex gap-2">
                 <a class="btn btn-light btn-sm" href="{{ url_for('main.listar_empresas') }}">Empresas</a>
+                <a class="btn btn-light btn-sm" href="{{ url_for('main.listar_unidades') }}">Unidades</a>
             </div>
         </div>
     </nav>
