@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Aplicações{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Aplicações</h2>
+    <a href="{{ url_for('main.nova_aplicacao') }}" class="btn btn-success">Nova Aplicação</a>
+</div>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Título</th>
+            <th>Questionário</th>
+            <th>Empresa</th>
+            <th>Status</th>
+            <th>Início</th>
+            <th>Fim</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for aplicacao in aplicacoes %}
+        <tr>
+            <td>{{ aplicacao.id }}</td>
+            <td>{{ aplicacao.titulo }}</td>
+            <td>{{ aplicacao.questionario.nome }}</td>
+            <td>{{ aplicacao.empresa.razao_social }}</td>
+            <td>{{ aplicacao.status }}</td>
+            <td>{{ aplicacao.data_inicio }}</td>
+            <td>{{ aplicacao.data_fim }}</td>
+
+            <td>
+                <a href="{{ url_for('main.editar_aplicacao', id=aplicacao.id) }}"
+                   class="btn btn-sm btn-primary">
+                    Editar
+                </a>
+
+                {% if aplicacao.status != 'Encerrada' %}
+                <form action="{{ url_for('main.encerrar_aplicacao', id=aplicacao.id) }}"
+                      method="post"
+                      class="d-inline"
+                      onsubmit="return confirm('Deseja encerrar esta aplicação?');">
+
+                    <button type="submit" class="btn btn-sm btn-warning">
+                        Encerrar
+                    </button>
+                </form>
+                {% endif %}
+            </td>
+
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="8" class="text-center">
+                Nenhuma aplicação cadastrada.
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

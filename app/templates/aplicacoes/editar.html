@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Aplicação{% endblock %}
+
+{% block content %}
+<h2>Editar Aplicação</h2>
+
+<form method="post" class="mt-3">
+
+    <div class="mb-3">
+        <label class="form-label">Título</label>
+
+        <input
+            type="text"
+            name="titulo"
+            class="form-control"
+            value="{{ aplicacao.titulo }}"
+            required
+        >
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Questionário</label>
+
+        <select name="questionario_id" class="form-select" required>
+
+            {% for questionario in questionarios %}
+            <option
+                value="{{ questionario.id }}"
+                {% if questionario.id == aplicacao.questionario_id %}selected{% endif %}
+            >
+                {{ questionario.nome }}
+            </option>
+            {% endfor %}
+
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Empresa</label>
+
+        <select name="empresa_id" class="form-select" required>
+
+            {% for empresa in empresas %}
+            <option
+                value="{{ empresa.id }}"
+                {% if empresa.id == aplicacao.empresa_id %}selected{% endif %}
+            >
+                {{ empresa.razao_social }}
+            </option>
+            {% endfor %}
+
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Unidade</label>
+
+        <select name="unidade_id" class="form-select">
+
+            <option value="">Sem unidade</option>
+
+            {% for unidade in unidades %}
+            <option
+                value="{{ unidade.id }}"
+                {% if aplicacao.unidade_id == unidade.id %}selected{% endif %}
+            >
+                {{ unidade.nome }}
+            </option>
+            {% endfor %}
+
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Setor</label>
+
+        <select name="setor_id" class="form-select">
+
+            <option value="">Sem setor</option>
+
+            {% for setor in setores %}
+            <option
+                value="{{ setor.id }}"
+                {% if aplicacao.setor_id == setor.id %}selected{% endif %}
+            >
+                {{ setor.nome }}
+            </option>
+            {% endfor %}
+
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Cargo</label>
+
+        <select name="cargo_id" class="form-select">
+
+            <option value="">Sem cargo</option>
+
+            {% for cargo in cargos %}
+            <option
+                value="{{ cargo.id }}"
+                {% if aplicacao.cargo_id == cargo.id %}selected{% endif %}
+            >
+                {{ cargo.nome }}
+            </option>
+            {% endfor %}
+
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Data Início</label>
+
+        <input
+            type="date"
+            name="data_inicio"
+            class="form-control"
+            value="{{ aplicacao.data_inicio }}"
+        >
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Data Fim</label>
+
+        <input
+            type="date"
+            name="data_fim"
+            class="form-control"
+            value="{{ aplicacao.data_fim }}"
+        >
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Status</label>
+
+        <select name="status" class="form-select">
+
+            <option
+                value="Aberta"
+                {% if aplicacao.status == 'Aberta' %}selected{% endif %}
+            >
+                Aberta
+            </option>
+
+            <option
+                value="Encerrada"
+                {% if aplicacao.status == 'Encerrada' %}selected{% endif %}
+            >
+                Encerrada
+            </option>
+
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+        Atualizar
+    </button>
+
+    <a
+        href="{{ url_for('main.listar_aplicacoes') }}"
+        class="btn btn-secondary"
+    >
+        Voltar
+    </a>
+
+</form>
+{% endblock %}

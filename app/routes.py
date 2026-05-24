@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from app import db
 from app.models import Empresa, Unidade, Setor, Cargo
+from app.models import Empresa, Unidade, Setor, Cargo, Questionario, Pergunta, Aplicacao
 
 main = Blueprint("main", __name__)
 
@@ -290,3 +291,128 @@ def inativar_cargo(id):
 
     flash("Cargo inativado com sucesso!", "warning")
     return redirect(url_for("main.listar_cargos"))
+
+# =========================
+# APLICAÇÕES
+# =========================
+@main.route("/aplicacoes")
+def listar_aplicacoes():
+    aplicacoes = Aplicacao.query.order_by(Aplicacao.id.desc()).all()
+    return render_template("aplicacoes/listar.html", aplicacoes=aplicacoes)
+
+
+@main.route("/aplicacoes/nova", methods=["GET", "POST"])
+def nova_aplicacao():
+    questionarios = Questionario.query.filter_by(status="Ativo").order_by(Questionario.nome.asc()).all()
+    empresas = Empresa.query.filter_by(status="Ativa").order_by(Empresa.razao_social.asc()).all()
+    unidades = Unidade.query.filter_by(status="Ativa").order_by(Unidade.nome.asc()).all()
+    setores = Setor.query.filter_by(status="Ativa").order_by(Setor.nome.asc()).all()
+    cargos = Cargo.query.filter_by(status="Ativa").order_by(Cargo.nome.asc()).all()
+
+    if request.method == "POST":
+
+        unidade_id = request.form.get("unidade_id")
+        setor_id = request.form.get("setor_id")
+        cargo_id = request.form.get("cargo_id")
+
+        if unidade_id == "":
+            unidade_id = None
+
+        if setor_id == "":
+            setor_id = None
+
+        if cargo_id == "":
+            cargo_id = None
+
+        aplicacao = Aplicacao(
+            questionario_id=request.form["questionario_id"],
+            empresa_id=request.form["empresa_id"],
+            unidade_id=unidade_id,
+            setor_id=setor_id,
+            cargo_id=cargo_id,
+            titulo=request.form["titulo"],
+            data_inicio=request.form["data_inicio"],
+            data_fim=request.form["data_fim"],
+            status=request.form["status"]
+        )
+
+        db.session.add(aplicacao)
+        db.session.commit()
+
+        flash("Aplicação cadastrada com sucesso!", "success")
+        return redirect(url_for("main.listar_aplicacoes"))
+
+    return render_template(
+        "aplicacoes/nova.html",
+        questionarios=questionarios,
+        empresas=empresas,
+        unidades=unidades,
+        setores=setores,
+        cargos=cargos
+    )
+
+
+@main.route("/aplicacoes/<int:id>/editar", methods=["GET", "POST"])
+def editar_aplicacao(id):
+
+    aplicacao = Aplicacao.query.get_or_404(id)
+
+    questionarios = Questionario.query.filter_by(status="Ativo").order_by(Questionario.nome.asc()).all()
+    empresas = Empresa.query.filter_by(status="Ativa").order_by(Empresa.razao_social.asc()).all()
+    unidades = Unidade.query.filter_by(status="Ativa").order_by(Unidade.nome.asc()).all()
+    setores = Setor.query.filter_by(status="Ativa").order_by(Setor.nome.asc()).all()
+    cargos = Cargo.query.filter_by(status="Ativa").order_by(Cargo.nome.asc()).all()
+
+    if request.method == "POST":
+
+        unidade_id = request.form.get("unidade_id")
+        setor_id = request.form.get("setor_id")
+        cargo_id = request.form.get("cargo_id")
+
+        if unidade_id == "":
+            unidade_id = None
+
+        if setor_id == "":
+            setor_id = None
+
+        if cargo_id == "":
+            cargo_id = None
+
+        aplicacao.questionario_id = request.form["questionario_id"]
+        aplicacao.empresa_id = request.form["empresa_id"]
+        aplicacao.unidade_id = unidade_id
+        aplicacao.setor_id = setor_id
+        aplicacao.cargo_id = cargo_id
+        aplicacao.titulo = request.form["titulo"]
+        aplicacao.data_inicio = request.form["data_inicio"]
+        aplicacao.data_fim = request.form["data_fim"]
+        aplicacao.status = request.form["status"]
+
+        db.session.commit()
+
+        flash("Aplicação atualizada com sucesso!", "success")
+        return redirect(url_for("main.listar_aplicacoes"))
+
+    return render_template(
+        "aplicacoes/editar.html",
+        aplicacao=aplicacao,
+        questionarios=questionarios,
+        empresas=empresas,
+        unidades=unidades,
+        setores=setores,
+        cargos=cargos
+    )
+
+
+@main.route("/aplicacoes/<int:id>/encerrar", methods=["POST"])
+def encerrar_aplicacao(id):
+
+    aplicacao = Aplicacao.query.get_or_404(id)
+
+    aplicacao.status = "Encerrada"
+
+    db.session.commit()
+
+    flash("Aplicação encerrada com sucesso!", "warning")
+
+    return redirect(url_for("main.listar_aplicacoes"))
