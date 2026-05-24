@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from app import db
 from app.models import Empresa, Unidade, Setor, Cargo
-from app.models import Empresa, Unidade, Setor, Cargo, Questionario, Pergunta, Aplicacao
+from app.models import Empresa, Unidade, Setor, Cargo, Questionario, Pergunta, Aplicacao, Resposta
 
 main = Blueprint("main", __name__)
 
@@ -416,3 +416,54 @@ def encerrar_aplicacao(id):
     flash("Aplicação encerrada com sucesso!", "warning")
 
     return redirect(url_for("main.listar_aplicacoes"))
+
+# =========================
+# RESPOSTAS DO QUESTIONÁRIO
+# =========================
+@main.route("/aplicacoes/<int:id>/responder", methods=["GET", "POST"])
+def responder_aplicacao(id):
+    aplicacao = Aplicacao.query.get_or_404(id)
+
+    perguntas = Pergunta.query.filter_by(
+        questionario_id=aplicacao.questionario_id,
+        status="Ativa"
+    ).order_by(Pergunta.ordem.asc()).all()
+
+    if request.method == "POST":
+        for pergunta in perguntas:
+            campo = f"pergunta_{pergunta.id}"
+            valor = request.form.get(campo)
+
+            if valor:
+                resposta = Resposta(
+                    aplicacao_id=aplicacao.id,
+                    pergunta_id=pergunta.id,
+                    valor_resposta=valor
+                )
+                db.session.add(resposta)
+
+        db.session.commit()
+
+        flash("Respostas salvas com sucesso!", "success")
+        return redirect(url_for("main.listar_aplicacoes"))
+
+    return render_template(
+        "respostas/responder.html",
+        aplicacao=aplicacao,
+        perguntas=perguntas
+    )
+
+
+@main.route("/aplicacoes/<int:id>/respostas")
+def visualizar_respostas(id):
+    aplicacao = Aplicacao.query.get_or_404(id)
+
+    respostas = Resposta.query.filter_by(
+        aplicacao_id=aplicacao.id
+    ).order_by(Resposta.id.asc()).all()
+
+    return render_template(
+        "respostas/listar.html",
+        aplicacao=aplicacao,
+        respostas=respostas
+    )

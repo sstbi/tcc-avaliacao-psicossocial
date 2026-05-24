@@ -38,6 +38,16 @@
                     Editar
                 </a>
 
+                <a href="{{ url_for('main.responder_aplicacao', id=aplicacao.id) }}"
+                   class="btn btn-sm btn-success">
+                   Responder
+                </a>
+
+                <a href="{{ url_for('main.visualizar_respostas', id=aplicacao.id) }}"
+                   class="btn btn-sm btn-info">
+                   Respostas
+                </a>
+
                 {% if aplicacao.status != 'Encerrada' %}
                 <form action="{{ url_for('main.encerrar_aplicacao', id=aplicacao.id) }}"
                       method="post"

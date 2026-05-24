@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Respostas{% endblock %}
+
+{% block content %}
+<h2>Respostas da Aplicação</h2>
+
+<p><strong>Aplicação:</strong> {{ aplicacao.titulo }}</p>
+<p><strong>Questionário:</strong> {{ aplicacao.questionario.nome }}</p>
+<p><strong>Empresa:</strong> {{ aplicacao.empresa.razao_social }}</p>
+
+<table class="table table-bordered table-striped mt-4">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Pergunta</th>
+            <th>Resposta</th>
+            <th>Data</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for resposta in respostas %}
+        <tr>
+            <td>{{ resposta.id }}</td>
+            <td>{{ resposta.pergunta.texto }}</td>
+            <td>{{ resposta.valor_resposta }}</td>
+            <td>{{ resposta.criado_em }}</td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="4" class="text-center">
+                Nenhuma resposta cadastrada para esta aplicação.
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<a href="{{ url_for('main.listar_aplicacoes') }}" class="btn btn-secondary">
+    Voltar
+</a>
+{% endblock %}

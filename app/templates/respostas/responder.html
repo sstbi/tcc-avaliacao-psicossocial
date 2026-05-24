@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Responder Questionário{% endblock %}
+
+{% block content %}
+<h2>Responder Questionário</h2>
+
+<p><strong>Aplicação:</strong> {{ aplicacao.titulo }}</p>
+<p><strong>Questionário:</strong> {{ aplicacao.questionario.nome }}</p>
+<p><strong>Empresa:</strong> {{ aplicacao.empresa.razao_social }}</p>
+
+<form method="post" class="mt-4">
+
+    {% for pergunta in perguntas %}
+    <div class="mb-4 p-3 border rounded bg-light">
+        <label class="form-label">
+            <strong>{{ pergunta.ordem }}.</strong> {{ pergunta.texto }}
+        </label>
+
+        {% if pergunta.tipo_resposta == "escala_1_5" %}
+            <select name="pergunta_{{ pergunta.id }}" class="form-select" {% if pergunta.obrigatoria %}required{% endif %}>
+                <option value="">Selecione...</option>
+                <option value="1">1 - Nunca / Muito baixo</option>
+                <option value="2">2 - Raramente / Baixo</option>
+                <option value="3">3 - Às vezes / Médio</option>
+                <option value="4">4 - Frequentemente / Alto</option>
+                <option value="5">5 - Sempre / Muito alto</option>
+            </select>
+
+        {% elif pergunta.tipo_resposta == "sim_nao" %}
+            <select name="pergunta_{{ pergunta.id }}" class="form-select" {% if pergunta.obrigatoria %}required{% endif %}>
+                <option value="">Selecione...</option>
+                <option value="sim">Sim</option>
+                <option value="nao">Não</option>
+            </select>
+
+        {% else %}
+            <textarea name="pergunta_{{ pergunta.id }}" class="form-control" rows="3" {% if pergunta.obrigatoria %}required{% endif %}></textarea>
+        {% endif %}
+    </div>
+    {% else %}
+    <div class="alert alert-warning">
+        Nenhuma pergunta ativa encontrada para este questionário.
+    </div>
+    {% endfor %}
+
+    {% if perguntas %}
+    <button type="submit" class="btn btn-success">
+        Enviar Respostas
+    </button>
+    {% endif %}
+
+    <a href="{{ url_for('main.listar_aplicacoes') }}" class="btn btn-secondary">
+        Voltar
+    </a>
+
+</form>
+{% endblock %}
