@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Perguntas{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Perguntas</h2>
+    <a href="{{ url_for('main.nova_pergunta') }}" class="btn btn-success">Nova Pergunta</a>
+</div>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Questionário</th>
+            <th>Ordem</th>
+            <th>Pergunta</th>
+            <th>Tipo</th>
+            <th>Obrigatória</th>
+            <th>Status</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for pergunta in perguntas %}
+        <tr>
+            <td>{{ pergunta.id }}</td>
+            <td>{{ pergunta.questionario.nome }}</td>
+            <td>{{ pergunta.ordem }}</td>
+            <td>{{ pergunta.texto }}</td>
+            <td>{{ pergunta.tipo_resposta }}</td>
+            <td>{{ 'Sim' if pergunta.obrigatoria else 'Não' }}</td>
+            <td>{{ pergunta.status }}</td>
+            <td>
+                <a href="{{ url_for('main.editar_pergunta', id=pergunta.id) }}" class="btn btn-sm btn-primary">
+                    Editar
+                </a>
+
+                {% if pergunta.status != 'Inativa' %}
+                <form action="{{ url_for('main.inativar_pergunta', id=pergunta.id) }}"
+                      method="post"
+                      class="d-inline"
+                      onsubmit="return confirm('Tem certeza que deseja inativar esta pergunta?');">
+                    <button type="submit" class="btn btn-sm btn-warning">
+                        Inativar
+                    </button>
+                </form>
+                {% endif %}
+            </td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="8" class="text-center">Nenhuma pergunta cadastrada.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

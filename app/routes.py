@@ -1,14 +1,67 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
+from sqlalchemy import func, cast, Integer
+
 from app import db
-from app.models import Empresa, Unidade, Setor, Cargo
 from app.models import Empresa, Unidade, Setor, Cargo, Questionario, Pergunta, Aplicacao, Resposta
+
 
 main = Blueprint("main", __name__)
 
 
 @main.route("/")
 def index():
-    return render_template("index.html")
+    total_empresas = Empresa.query.count()
+    total_questionarios = Questionario.query.count()
+    total_aplicacoes = Aplicacao.query.count()
+    total_respostas = Resposta.query.count()
+
+    aplicacoes_abertas = Aplicacao.query.filter_by(status="Aberta").count()
+    aplicacoes_encerradas = Aplicacao.query.filter_by(status="Encerrada").count()
+
+    media_respostas = db.session.query(
+        func.avg(cast(Resposta.valor_resposta, Integer))
+    ).join(Pergunta).filter(
+        Pergunta.tipo_resposta == "escala_1_5"
+    ).scalar()
+
+    media_respostas = 0 if media_respostas is None else round(float(media_respostas), 2)
+
+    respostas_por_pergunta = db.session.query(
+        Pergunta.texto,
+        func.avg(cast(Resposta.valor_resposta, Integer))
+    ).join(
+        Resposta,
+        Resposta.pergunta_id == Pergunta.id
+    ).filter(
+        Pergunta.tipo_resposta == "escala_1_5"
+    ).group_by(
+        Pergunta.id
+    ).order_by(
+        Pergunta.ordem.asc()
+    ).all()
+
+    labels_perguntas = [
+        item[0][:40] + "..." if len(item[0]) > 40 else item[0]
+        for item in respostas_por_pergunta
+    ]
+
+    medias_perguntas = [
+        round(float(item[1]), 2)
+        for item in respostas_por_pergunta
+    ]
+
+    return render_template(
+        "index.html",
+        total_empresas=total_empresas,
+        total_questionarios=total_questionarios,
+        total_aplicacoes=total_aplicacoes,
+        total_respostas=total_respostas,
+        aplicacoes_abertas=aplicacoes_abertas,
+        aplicacoes_encerradas=aplicacoes_encerradas,
+        media_respostas=media_respostas,
+        labels_perguntas=labels_perguntas,
+        medias_perguntas=medias_perguntas
+    )
 
 
 # =========================
@@ -292,6 +345,126 @@ def inativar_cargo(id):
     flash("Cargo inativado com sucesso!", "warning")
     return redirect(url_for("main.listar_cargos"))
 
+
+# =========================
+# QUESTIONÁRIOS
+# =========================
+@main.route("/questionarios")
+def listar_questionarios():
+    questionarios = Questionario.query.order_by(Questionario.id.desc()).all()
+    return render_template("questionarios/listar.html", questionarios=questionarios)
+
+
+@main.route("/questionarios/novo", methods=["GET", "POST"])
+def novo_questionario():
+    if request.method == "POST":
+        questionario = Questionario(
+            nome=request.form["nome"],
+            descricao=request.form["descricao"],
+            status=request.form["status"]
+        )
+        db.session.add(questionario)
+        db.session.commit()
+
+        flash("Questionário cadastrado com sucesso!", "success")
+        return redirect(url_for("main.listar_questionarios"))
+
+    return render_template("questionarios/novo.html")
+
+
+@main.route("/questionarios/<int:id>/editar", methods=["GET", "POST"])
+def editar_questionario(id):
+    questionario = Questionario.query.get_or_404(id)
+
+    if request.method == "POST":
+        questionario.nome = request.form["nome"]
+        questionario.descricao = request.form["descricao"]
+        questionario.status = request.form["status"]
+
+        db.session.commit()
+
+        flash("Questionário atualizado com sucesso!", "success")
+        return redirect(url_for("main.listar_questionarios"))
+
+    return render_template("questionarios/editar.html", questionario=questionario)
+
+
+@main.route("/questionarios/<int:id>/inativar", methods=["POST"])
+def inativar_questionario(id):
+    questionario = Questionario.query.get_or_404(id)
+    questionario.status = "Inativo"
+    db.session.commit()
+
+    flash("Questionário inativado com sucesso!", "warning")
+    return redirect(url_for("main.listar_questionarios"))
+
+
+# =========================
+# PERGUNTAS
+# =========================
+@main.route("/perguntas")
+def listar_perguntas():
+    perguntas = Pergunta.query.order_by(Pergunta.ordem.asc(), Pergunta.id.asc()).all()
+    return render_template("perguntas/listar.html", perguntas=perguntas)
+
+
+@main.route("/perguntas/nova", methods=["GET", "POST"])
+def nova_pergunta():
+    questionarios = Questionario.query.filter_by(status="Ativo").order_by(Questionario.nome.asc()).all()
+
+    if request.method == "POST":
+        obrigatoria = True if request.form.get("obrigatoria") == "sim" else False
+
+        pergunta = Pergunta(
+            questionario_id=request.form["questionario_id"],
+            texto=request.form["texto"],
+            tipo_resposta=request.form["tipo_resposta"],
+            obrigatoria=obrigatoria,
+            ordem=request.form["ordem"],
+            status=request.form["status"]
+        )
+        db.session.add(pergunta)
+        db.session.commit()
+
+        flash("Pergunta cadastrada com sucesso!", "success")
+        return redirect(url_for("main.listar_perguntas"))
+
+    return render_template("perguntas/nova.html", questionarios=questionarios)
+
+
+@main.route("/perguntas/<int:id>/editar", methods=["GET", "POST"])
+def editar_pergunta(id):
+    pergunta = Pergunta.query.get_or_404(id)
+    questionarios = Questionario.query.filter_by(status="Ativo").order_by(Questionario.nome.asc()).all()
+
+    if request.method == "POST":
+        obrigatoria = True if request.form.get("obrigatoria") == "sim" else False
+
+        pergunta.questionario_id = request.form["questionario_id"]
+        pergunta.texto = request.form["texto"]
+        pergunta.tipo_resposta = request.form["tipo_resposta"]
+        pergunta.obrigatoria = obrigatoria
+        pergunta.ordem = request.form["ordem"]
+        pergunta.status = request.form["status"]
+
+        db.session.commit()
+
+        flash("Pergunta atualizada com sucesso!", "success")
+        return redirect(url_for("main.listar_perguntas"))
+
+    return render_template("perguntas/editar.html", pergunta=pergunta, questionarios=questionarios)
+
+
+@main.route("/perguntas/<int:id>/inativar", methods=["POST"])
+def inativar_pergunta(id):
+    pergunta = Pergunta.query.get_or_404(id)
+    pergunta.status = "Inativa"
+    db.session.commit()
+
+    flash("Pergunta inativada com sucesso!", "warning")
+    return redirect(url_for("main.listar_perguntas"))
+
+
 # =========================
 # APLICAÇÕES
 # =========================
@@ -310,19 +483,13 @@ def nova_aplicacao():
     cargos = Cargo.query.filter_by(status="Ativa").order_by(Cargo.nome.asc()).all()
 
     if request.method == "POST":
-
         unidade_id = request.form.get("unidade_id")
         setor_id = request.form.get("setor_id")
         cargo_id = request.form.get("cargo_id")
 
-        if unidade_id == "":
-            unidade_id = None
-
-        if setor_id == "":
-            setor_id = None
-
-        if cargo_id == "":
-            cargo_id = None
+        unidade_id = None if unidade_id == "" else unidade_id
+        setor_id = None if setor_id == "" else setor_id
+        cargo_id = None if cargo_id == "" else cargo_id
 
         aplicacao = Aplicacao(
             questionario_id=request.form["questionario_id"],
@@ -331,8 +498,8 @@ def nova_aplicacao():
             setor_id=setor_id,
             cargo_id=cargo_id,
             titulo=request.form["titulo"],
-            data_inicio=request.form["data_inicio"],
-            data_fim=request.form["data_fim"],
+            data_inicio=request.form["data_inicio"] or None,
+            data_fim=request.form["data_fim"] or None,
             status=request.form["status"]
         )
 
@@ -354,7 +521,6 @@ def nova_aplicacao():
 
 @main.route("/aplicacoes/<int:id>/editar", methods=["GET", "POST"])
 def editar_aplicacao(id):
-
     aplicacao = Aplicacao.query.get_or_404(id)
 
     questionarios = Questionario.query.filter_by(status="Ativo").order_by(Questionario.nome.asc()).all()
@@ -364,19 +530,13 @@ def editar_aplicacao(id):
     cargos = Cargo.query.filter_by(status="Ativa").order_by(Cargo.nome.asc()).all()
 
     if request.method == "POST":
-
         unidade_id = request.form.get("unidade_id")
         setor_id = request.form.get("setor_id")
         cargo_id = request.form.get("cargo_id")
 
-        if unidade_id == "":
-            unidade_id = None
-
-        if setor_id == "":
-            setor_id = None
-
-        if cargo_id == "":
-            cargo_id = None
+        unidade_id = None if unidade_id == "" else unidade_id
+        setor_id = None if setor_id == "" else setor_id
+        cargo_id = None if cargo_id == "" else cargo_id
 
         aplicacao.questionario_id = request.form["questionario_id"]
         aplicacao.empresa_id = request.form["empresa_id"]
@@ -384,8 +544,8 @@ def editar_aplicacao(id):
         aplicacao.setor_id = setor_id
         aplicacao.cargo_id = cargo_id
         aplicacao.titulo = request.form["titulo"]
-        aplicacao.data_inicio = request.form["data_inicio"]
-        aplicacao.data_fim = request.form["data_fim"]
+        aplicacao.data_inicio = request.form["data_inicio"] or None
+        aplicacao.data_fim = request.form["data_fim"] or None
         aplicacao.status = request.form["status"]
 
         db.session.commit()
@@ -406,16 +566,13 @@ def editar_aplicacao(id):
 
 @main.route("/aplicacoes/<int:id>/encerrar", methods=["POST"])
 def encerrar_aplicacao(id):
-
     aplicacao = Aplicacao.query.get_or_404(id)
-
     aplicacao.status = "Encerrada"
-
     db.session.commit()
 
     flash("Aplicação encerrada com sucesso!", "warning")
-
     return redirect(url_for("main.listar_aplicacoes"))
+
 
 # =========================
 # RESPOSTAS DO QUESTIONÁRIO
