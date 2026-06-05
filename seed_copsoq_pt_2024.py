@@ -21,7 +21,19 @@ with app.app_context():
         db.session.commit()
 
     with open(ARQUIVO_CSV, "r", encoding="latin-1", newline="") as arquivo:
-        leitor = csv.DictReader(arquivo, delimiter=";")
+        linhas_corrigidas = []
+
+        for linha in arquivo:
+            linha = linha.strip()
+
+            if linha.startswith('"') and linha.endswith('"'):
+                linha = linha[1:-1]
+
+            linhas_corrigidas.append(linha)
+
+        leitor = csv.DictReader(linhas_corrigidas, delimiter=";")
+
+        print("Cabeçalho encontrado:", leitor.fieldnames)
 
         for linha in leitor:
             ordem = int(linha["ordem"])

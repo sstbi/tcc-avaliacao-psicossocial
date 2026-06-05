@@ -20,7 +20,10 @@ def index():
 
     media_respostas = db.session.query(
         func.avg(cast(Resposta.valor_resposta, Integer))
-    ).join(Pergunta).filter(
+    ).join(
+        Pergunta,
+        Pergunta.id == Resposta.pergunta_id
+    ).filter(
         Pergunta.tipo_resposta == "escala_1_5"
     ).scalar()
 
@@ -35,7 +38,9 @@ def index():
     ).filter(
         Pergunta.tipo_resposta == "escala_1_5"
     ).group_by(
-        Pergunta.id
+        Pergunta.id,
+        Pergunta.texto,
+        Pergunta.ordem
     ).order_by(
         Pergunta.ordem.asc()
     ).all()

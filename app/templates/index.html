@@ -1,11 +1,123 @@
 {% extends "base.html" %}
 
-{% block title %}Início{% endblock %}
+{% block title %}Dashboard{% endblock %}
 
 {% block content %}
-<div class="p-4 bg-light rounded">
-    <h1 class="mb-3">Sistema de Avaliação Psicossocial</h1>
-    <p>Projeto de TCC para gestão da avaliação psicossocial ocupacional.</p>
-    <a href="{{ url_for('main.listar_empresas') }}" class="btn btn-primary">Ir para Empresas</a>
+<h2 class="mb-4">Dashboard Gerencial</h2>
+
+<div class="row mb-4">
+
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5>Empresas</h5>
+                <h2>{{ total_empresas }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5>Questionários</h5>
+                <h2>{{ total_questionarios }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5>Aplicações</h5>
+                <h2>{{ total_aplicacoes }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5>Respostas</h5>
+                <h2>{{ total_respostas }}</h2>
+            </div>
+        </div>
+    </div>
+
 </div>
+
+<div class="row mb-4">
+
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5>Aplicações Abertas</h5>
+                <h2>{{ aplicacoes_abertas }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5>Aplicações Encerradas</h5>
+                <h2>{{ aplicacoes_encerradas }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5>Média Geral</h5>
+                <h2>{{ media_respostas }}</h2>
+                <small>Escala 1 a 5</small>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <h5>Média por Pergunta</h5>
+
+        {% if labels_perguntas %}
+            <canvas id="graficoPerguntas"></canvas>
+        {% else %}
+            <div class="alert alert-warning mt-3">
+                Ainda não há respostas numéricas suficientes para gerar o gráfico.
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const labelsPerguntas = {{ labels_perguntas | tojson }};
+    const mediasPerguntas = {{ medias_perguntas | tojson }};
+
+    if (labelsPerguntas.length > 0) {
+        const ctx = document.getElementById('graficoPerguntas');
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labelsPerguntas,
+                datasets: [{
+                    label: 'Média da pergunta',
+                    data: mediasPerguntas
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 5
+                    }
+                }
+            }
+        });
+    }
+</script>
 {% endblock %}
