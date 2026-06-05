@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block title %}Resultado da Aplicação{% endblock %}
+
+{% block content %}
+<h2>Resultado da Aplicação</h2>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <p><strong>Aplicação:</strong> {{ aplicacao.titulo }}</p>
+        <p><strong>Questionário:</strong> {{ aplicacao.questionario.nome }}</p>
+        <p><strong>Empresa:</strong> {{ aplicacao.empresa.razao_social }}</p>
+
+        {% if aplicacao.unidade %}
+            <p><strong>Unidade:</strong> {{ aplicacao.unidade.nome }}</p>
+        {% endif %}
+
+        {% if aplicacao.setor %}
+            <p><strong>Setor:</strong> {{ aplicacao.setor.nome }}</p>
+        {% endif %}
+
+        {% if aplicacao.cargo %}
+            <p><strong>Cargo:</strong> {{ aplicacao.cargo.nome }}</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row mb-4">
+
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5>Média Geral</h5>
+                <h1>{{ media_geral }}</h1>
+                <small>Escala 1 a 5</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5>Classificação</h5>
+                <h1>{{ classificacao }}</h1>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5>Total de Respostas</h5>
+                <h1>
+                    {% set total = 0 %}
+                    {% for item in linhas_resultado %}
+                        {% set total = total + item.quantidade %}
+                    {% endfor %}
+                    {{ linhas_resultado | sum(attribute='quantidade') }}
+                </h1>
+                <small>Respostas numéricas</small>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="row mb-4">
+
+    {% if linhas_resultado %}
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <h5>Gráfico por Dimensão</h5>
+                <canvas id="graficoResultado"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5>Média Geral</h5>
+                <canvas id="graficoMediaGeral"></canvas>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-md-12">
+        <div class="alert alert-warning">
+            Ainda não há respostas numéricas para gerar gráficos.
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <h5>Resultado por Dimensão</h5>
+
+        {% if linhas_resultado %}
+            <table class="table table-bordered table-striped mt-3">
+                <thead>
+                    <tr>
+                        <th>Domínio</th>
+                        <th>Dimensão</th>
+                        <th>Média</th>
+                        <th>Respostas</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in linhas_resultado %}
+                    <tr>
+                        <td>{{ item.dominio }}</td>
+                        <td>{{ item.dimensao }}</td>
+                        <td>{{ item.media }}</td>
+                        <td>{{ item.quantidade }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="alert alert-warning mt-3">
+                Ainda não há respostas numéricas para esta aplicação.
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<a href="{{ url_for('main.listar_aplicacoes') }}" class="btn btn-secondary">
+    Voltar
+</a>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script type="application/json" id="labels-dimensoes">
+    {{ labels_dimensoes | default([]) | tojson }}
+</script>
+
+<script type="application/json" id="medias-dimensoes">
+    {{ medias_dimensoes | default([]) | tojson }}
+</script>
+
+<script type="application/json" id="media-geral">
+    {{ media_geral | default(0) | tojson }}
+</script>
+
+<script>
+    const labelsDimensoes = JSON.parse(
+        document.getElementById('labels-dimensoes').textContent
+    );
+
+    const mediasDimensoes = JSON.parse(
+        document.getElementById('medias-dimensoes').textContent
+    );
+
+    const mediaGeral = JSON.parse(
+        document.getElementById('media-geral').textContent
+    );
+
+    if (labelsDimensoes.length > 0) {
+        const ctxResultado = document.getElementById('graficoResultado');
+
+        new Chart(ctxResultado, {
+            type: 'bar',
+            data: {
+                labels: labelsDimensoes,
+                datasets: [{
+                    label: 'Média da dimensão',
+                    data: mediasDimensoes
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 5
+                    }
+                }
+            }
+        });
+
+        const ctxMedia = document.getElementById('graficoMediaGeral');
+
+        new Chart(ctxMedia, {
+            type: 'doughnut',
+            data: {
+                labels: ['Média Geral', 'Restante da escala'],
+                datasets: [{
+                    data: [mediaGeral, 5 - mediaGeral]
+                }]
+            }
+        });
+    }
+</script>
+{% endblock %}

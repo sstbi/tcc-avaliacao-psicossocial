@@ -94,8 +94,8 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-    const labelsPerguntas = {{ labels_perguntas | tojson }};
-    const mediasPerguntas = {{ medias_perguntas | tojson }};
+    const labelsPerguntas = JSON.parse('{{ labels_perguntas | tojson | safe }}');
+    const mediasPerguntas = JSON.parse('{{ medias_perguntas | tojson | safe }}');
 
     if (labelsPerguntas.length > 0) {
         const ctx = document.getElementById('graficoPerguntas');

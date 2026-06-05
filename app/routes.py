@@ -629,3 +629,103 @@ def visualizar_respostas(id):
         aplicacao=aplicacao,
         respostas=respostas
     )
+
+# =========================
+# RESULTADO DA APLICAÇÃO
+# =========================
+@main.route("/aplicacoes/<int:id>/resultado")
+def resultado_aplicacao(id):
+    aplicacao = Aplicacao.query.get_or_404(id)
+
+    respostas = Resposta.query.filter_by(
+        aplicacao_id=aplicacao.id
+    ).join(
+        Pergunta,
+        Pergunta.id == Resposta.pergunta_id
+    ).filter(
+        Pergunta.tipo_resposta == "escala_1_5"
+    ).all()
+
+    valores = []
+
+    resultado_dimensoes = {}
+
+    for resposta in respostas:
+        try:
+            valor = int(resposta.valor_resposta)
+        except ValueError:
+            continue
+
+        valores.append(valor)
+
+        texto = resposta.pergunta.texto
+
+        dominio = "Não informado"
+        dimensao = "Não informado"
+
+        if texto.startswith("[") and "]" in texto:
+            cabecalho = texto.split("]")[0].replace("[", "")
+            partes = cabecalho.split("|")
+
+            if len(partes) == 2:
+                dominio = partes[0].strip()
+                dimensao = partes[1].strip()
+
+        chave = (dominio, dimensao)
+
+        if chave not in resultado_dimensoes:
+            resultado_dimensoes[chave] = []
+
+        resultado_dimensoes[chave].append(valor)
+
+    media_geral = 0
+
+    if valores:
+        media_geral = round(sum(valores) / len(valores), 2)
+
+    if media_geral == 0:
+        classificacao = "Sem dados"
+    elif media_geral < 2:
+        classificacao = "Baixo"
+    elif media_geral < 3:
+        classificacao = "Moderado"
+    elif media_geral < 4:
+        classificacao = "Alto"
+    else:
+        classificacao = "Crítico"
+
+    linhas_resultado = []
+
+    for chave, lista_valores in resultado_dimensoes.items():
+        dominio, dimensao = chave
+        media = round(sum(lista_valores) / len(lista_valores), 2)
+
+        linhas_resultado.append({
+            "dominio": dominio,
+            "dimensao": dimensao,
+            "media": media,
+            "quantidade": len(lista_valores)
+        })
+
+    linhas_resultado = sorted(
+        linhas_resultado,
+        key=lambda item: (item["dominio"], item["dimensao"])
+    )
+
+    labels_dimensoes = [
+        item["dimensao"] for item in linhas_resultado
+    ]
+
+    medias_dimensoes = [
+        item["media"] for item in linhas_resultado
+    ]
+
+    return render_template(
+        "resultados/aplicacao.html",
+        aplicacao=aplicacao,
+        media_geral=media_geral,
+        classificacao=classificacao,
+        linhas_resultado=linhas_resultado,
+        labels_dimensoes=labels_dimensoes,
+        medias_dimensoes=medias_dimensoes
+    )

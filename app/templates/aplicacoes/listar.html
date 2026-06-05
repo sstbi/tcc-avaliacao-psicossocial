@@ -48,6 +48,11 @@
                    Respostas
                 </a>
 
+                <a href="{{ url_for('main.resultado_aplicacao', id=aplicacao.id) }}"
+                   class="btn btn-sm btn-dark">
+                   Resultado
+                </a>
+
                 {% if aplicacao.status != 'Encerrada' %}
                 <form action="{{ url_for('main.encerrar_aplicacao', id=aplicacao.id) }}"
                       method="post"
