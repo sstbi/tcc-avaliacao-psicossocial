@@ -684,15 +684,25 @@ def resultado_aplicacao(id):
         media_geral = round(sum(valores) / len(valores), 2)
 
     if media_geral == 0:
-        classificacao = "Sem dados"
+       classificacao = "Sem dados"
+       descricao_classificacao = "Não há respostas suficientes para gerar uma classificação."
+       recomendacao = "Realizar a aplicação do questionário e coletar respostas válidas."
     elif media_geral < 2:
         classificacao = "Baixo"
+        descricao_classificacao = "Os resultados indicam baixo nível de exposição aos fatores psicossociais avaliados."
+        recomendacao = "Manter as práticas organizacionais atuais e acompanhar periodicamente os indicadores."
     elif media_geral < 3:
         classificacao = "Moderado"
+        descricao_classificacao = "Os resultados indicam atenção moderada aos fatores psicossociais avaliados."
+        recomendacao = "Monitorar os fatores identificados e avaliar ações preventivas junto aos setores envolvidos."
     elif media_geral < 4:
         classificacao = "Alto"
+        descricao_classificacao = "Os resultados indicam alto nível de atenção para riscos psicossociais."
+        recomendacao = "Recomenda-se análise detalhada dos fatores críticos e definição de plano de ação preventivo."
     else:
         classificacao = "Crítico"
+        descricao_classificacao = "Os resultados indicam nível crítico de exposição aos fatores psicossociais avaliados."
+        recomendacao = "Recomenda-se intervenção prioritária, investigação aprofundada e acompanhamento técnico especializado."
 
     linhas_resultado = []
 
@@ -721,11 +731,13 @@ def resultado_aplicacao(id):
     ]
 
     return render_template(
-        "resultados/aplicacao.html",
-        aplicacao=aplicacao,
-        media_geral=media_geral,
-        classificacao=classificacao,
-        linhas_resultado=linhas_resultado,
-        labels_dimensoes=labels_dimensoes,
-        medias_dimensoes=medias_dimensoes
-    )
+    "resultados/aplicacao.html",
+    aplicacao=aplicacao,
+    media_geral=media_geral,
+    classificacao=classificacao,
+    descricao_classificacao=descricao_classificacao,
+    recomendacao=recomendacao,
+    linhas_resultado=linhas_resultado,
+    labels_dimensoes=labels_dimensoes,
+    medias_dimensoes=medias_dimensoes
+)
