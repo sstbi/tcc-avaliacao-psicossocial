@@ -1,19 +1,79 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
-from sqlalchemy import func, cast, Integer
+from flask import (
+    Blueprint,
+    render_template,
+    request,
+    redirect,
+    url_for,
+    flash,
+    send_file,
+    session
+)
 
-from app import db
-from app.models import Empresa, Unidade, Setor, Cargo, Questionario, Pergunta, Aplicacao, Resposta
-from flask import Blueprint, render_template, request, redirect, url_for, flash
-from flask import Blueprint, render_template, request, redirect, url_for, flash, send_file
+from sqlalchemy import func, cast, Integer
+from functools import wraps
+import tempfile
+
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet
-import tempfile
+
+from app import db
+from app.models import (
+    Empresa,
+    Unidade,
+    Setor,
+    Cargo,
+    Questionario,
+    Pergunta,
+    Aplicacao,
+    Resposta
+)
 
 
 main = Blueprint("main", __name__)
 
 
+# =========================
+# LOGIN / SEGURANÇA
+# =========================
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not session.get("usuario_logado"):
+            flash("Faça login para acessar o sistema.", "warning")
+            return redirect(url_for("main.login"))
+        return f(*args, **kwargs)
+    return decorated_function
+
+
+@main.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        usuario = request.form.get("usuario")
+        senha = request.form.get("senha")
+
+        if usuario == "admin" and senha == "123456":
+            session["usuario_logado"] = True
+            session["nome_usuario"] = "Administrador"
+            flash("Login realizado com sucesso!", "success")
+            return redirect(url_for("main.index"))
+
+        flash("Usuário ou senha inválidos.", "danger")
+
+    return render_template("login.html")
+
+
+@main.route("/logout")
+def logout():
+    session.clear()
+    flash("Logout realizado com sucesso.", "success")
+    return redirect(url_for("main.login"))
+
+
+# =========================
+# DASHBOARD
+# =========================
 @main.route("/")
+@login_required
 def index():
     total_empresas = Empresa.query.count()
     total_questionarios = Questionario.query.count()
@@ -78,12 +138,14 @@ def index():
 # EMPRESAS
 # =========================
 @main.route("/empresas")
+@login_required
 def listar_empresas():
     empresas = Empresa.query.order_by(Empresa.id.desc()).all()
     return render_template("empresas/listar.html", empresas=empresas)
 
 
 @main.route("/empresas/nova", methods=["GET", "POST"])
+@login_required
 def nova_empresa():
     if request.method == "POST":
         empresa = Empresa(
@@ -105,6 +167,7 @@ def nova_empresa():
 
 
 @main.route("/empresas/<int:id>/editar", methods=["GET", "POST"])
+@login_required
 def editar_empresa(id):
     empresa = Empresa.query.get_or_404(id)
 
@@ -126,6 +189,7 @@ def editar_empresa(id):
 
 
 @main.route("/empresas/<int:id>/inativar", methods=["POST"])
+@login_required
 def inativar_empresa(id):
     empresa = Empresa.query.get_or_404(id)
     empresa.status = "Inativa"
@@ -139,12 +203,14 @@ def inativar_empresa(id):
 # UNIDADES
 # =========================
 @main.route("/unidades")
+@login_required
 def listar_unidades():
     unidades = Unidade.query.order_by(Unidade.id.desc()).all()
     return render_template("unidades/listar.html", unidades=unidades)
 
 
 @main.route("/unidades/nova", methods=["GET", "POST"])
+@login_required
 def nova_unidade():
     empresas = Empresa.query.filter_by(status="Ativa").order_by(Empresa.razao_social.asc()).all()
 
@@ -165,6 +231,7 @@ def nova_unidade():
 
 
 @main.route("/unidades/<int:id>/editar", methods=["GET", "POST"])
+@login_required
 def editar_unidade(id):
     unidade = Unidade.query.get_or_404(id)
     empresas = Empresa.query.filter_by(status="Ativa").order_by(Empresa.razao_social.asc()).all()
@@ -184,6 +251,7 @@ def editar_unidade(id):
 
 
 @main.route("/unidades/<int:id>/inativar", methods=["POST"])
+@login_required
 def inativar_unidade(id):
     unidade = Unidade.query.get_or_404(id)
     unidade.status = "Inativa"
@@ -197,12 +265,14 @@ def inativar_unidade(id):
 # SETORES
 # =========================
 @main.route("/setores")
+@login_required
 def listar_setores():
     setores = Setor.query.order_by(Setor.id.desc()).all()
     return render_template("setores/listar.html", setores=setores)
 
 
 @main.route("/setores/novo", methods=["GET", "POST"])
+@login_required
 def novo_setor():
     empresas = Empresa.query.filter_by(status="Ativa").order_by(Empresa.razao_social.asc()).all()
     unidades = Unidade.query.filter_by(status="Ativa").order_by(Unidade.nome.asc()).all()
@@ -229,6 +299,7 @@ def novo_setor():
 
 
 @main.route("/setores/<int:id>/editar", methods=["GET", "POST"])
+@login_required
 def editar_setor(id):
     setor = Setor.query.get_or_404(id)
     empresas = Empresa.query.filter_by(status="Ativa").order_by(Empresa.razao_social.asc()).all()
@@ -254,6 +325,7 @@ def editar_setor(id):
 
 
 @main.route("/setores/<int:id>/inativar", methods=["POST"])
+@login_required
 def inativar_setor(id):
     setor = Setor.query.get_or_404(id)
     setor.status = "Inativa"
@@ -267,12 +339,14 @@ def inativar_setor(id):
 # CARGOS
 # =========================
 @main.route("/cargos")
+@login_required
 def listar_cargos():
     cargos = Cargo.query.order_by(Cargo.id.desc()).all()
     return render_template("cargos/listar.html", cargos=cargos)
 
 
 @main.route("/cargos/novo", methods=["GET", "POST"])
+@login_required
 def novo_cargo():
     empresas = Empresa.query.filter_by(status="Ativa").order_by(Empresa.razao_social.asc()).all()
     unidades = Unidade.query.filter_by(status="Ativa").order_by(Unidade.nome.asc()).all()
@@ -310,6 +384,7 @@ def novo_cargo():
 
 
 @main.route("/cargos/<int:id>/editar", methods=["GET", "POST"])
+@login_required
 def editar_cargo(id):
     cargo = Cargo.query.get_or_404(id)
     empresas = Empresa.query.filter_by(status="Ativa").order_by(Empresa.razao_social.asc()).all()
@@ -347,6 +422,7 @@ def editar_cargo(id):
 
 
 @main.route("/cargos/<int:id>/inativar", methods=["POST"])
+@login_required
 def inativar_cargo(id):
     cargo = Cargo.query.get_or_404(id)
     cargo.status = "Inativa"
@@ -360,12 +436,14 @@ def inativar_cargo(id):
 # QUESTIONÁRIOS
 # =========================
 @main.route("/questionarios")
+@login_required
 def listar_questionarios():
     questionarios = Questionario.query.order_by(Questionario.id.desc()).all()
     return render_template("questionarios/listar.html", questionarios=questionarios)
 
 
 @main.route("/questionarios/novo", methods=["GET", "POST"])
+@login_required
 def novo_questionario():
     if request.method == "POST":
         questionario = Questionario(
@@ -383,6 +461,7 @@ def novo_questionario():
 
 
 @main.route("/questionarios/<int:id>/editar", methods=["GET", "POST"])
+@login_required
 def editar_questionario(id):
     questionario = Questionario.query.get_or_404(id)
 
@@ -400,6 +479,7 @@ def editar_questionario(id):
 
 
 @main.route("/questionarios/<int:id>/inativar", methods=["POST"])
+@login_required
 def inativar_questionario(id):
     questionario = Questionario.query.get_or_404(id)
     questionario.status = "Inativo"
@@ -413,12 +493,14 @@ def inativar_questionario(id):
 # PERGUNTAS
 # =========================
 @main.route("/perguntas")
+@login_required
 def listar_perguntas():
     perguntas = Pergunta.query.order_by(Pergunta.ordem.asc(), Pergunta.id.asc()).all()
     return render_template("perguntas/listar.html", perguntas=perguntas)
 
 
 @main.route("/perguntas/nova", methods=["GET", "POST"])
+@login_required
 def nova_pergunta():
     questionarios = Questionario.query.filter_by(status="Ativo").order_by(Questionario.nome.asc()).all()
 
@@ -443,6 +525,7 @@ def nova_pergunta():
 
 
 @main.route("/perguntas/<int:id>/editar", methods=["GET", "POST"])
+@login_required
 def editar_pergunta(id):
     pergunta = Pergunta.query.get_or_404(id)
     questionarios = Questionario.query.filter_by(status="Ativo").order_by(Questionario.nome.asc()).all()
@@ -466,6 +549,7 @@ def editar_pergunta(id):
 
 
 @main.route("/perguntas/<int:id>/inativar", methods=["POST"])
+@login_required
 def inativar_pergunta(id):
     pergunta = Pergunta.query.get_or_404(id)
     pergunta.status = "Inativa"
@@ -479,12 +563,14 @@ def inativar_pergunta(id):
 # APLICAÇÕES
 # =========================
 @main.route("/aplicacoes")
+@login_required
 def listar_aplicacoes():
     aplicacoes = Aplicacao.query.order_by(Aplicacao.id.desc()).all()
     return render_template("aplicacoes/listar.html", aplicacoes=aplicacoes)
 
 
 @main.route("/aplicacoes/nova", methods=["GET", "POST"])
+@login_required
 def nova_aplicacao():
     questionarios = Questionario.query.filter_by(status="Ativo").order_by(Questionario.nome.asc()).all()
     empresas = Empresa.query.filter_by(status="Ativa").order_by(Empresa.razao_social.asc()).all()
@@ -530,6 +616,7 @@ def nova_aplicacao():
 
 
 @main.route("/aplicacoes/<int:id>/editar", methods=["GET", "POST"])
+@login_required
 def editar_aplicacao(id):
     aplicacao = Aplicacao.query.get_or_404(id)
 
@@ -575,6 +662,7 @@ def editar_aplicacao(id):
 
 
 @main.route("/aplicacoes/<int:id>/encerrar", methods=["POST"])
+@login_required
 def encerrar_aplicacao(id):
     aplicacao = Aplicacao.query.get_or_404(id)
     aplicacao.status = "Encerrada"
@@ -588,6 +676,7 @@ def encerrar_aplicacao(id):
 # RESPOSTAS DO QUESTIONÁRIO
 # =========================
 @main.route("/aplicacoes/<int:id>/responder", methods=["GET", "POST"])
+@login_required
 def responder_aplicacao(id):
     aplicacao = Aplicacao.query.get_or_404(id)
 
@@ -622,6 +711,7 @@ def responder_aplicacao(id):
 
 
 @main.route("/aplicacoes/<int:id>/respostas")
+@login_required
 def visualizar_respostas(id):
     aplicacao = Aplicacao.query.get_or_404(id)
 
@@ -635,10 +725,48 @@ def visualizar_respostas(id):
         respostas=respostas
     )
 
+
+# =========================
+# LINK PÚBLICO PARA FUNCIONÁRIO
+# =========================
+@main.route("/publico/<int:id>", methods=["GET", "POST"])
+def responder_publico(id):
+    aplicacao = Aplicacao.query.get_or_404(id)
+
+    perguntas = Pergunta.query.filter_by(
+        questionario_id=aplicacao.questionario_id,
+        status="Ativa"
+    ).order_by(Pergunta.ordem.asc()).all()
+
+    if request.method == "POST":
+        for pergunta in perguntas:
+            campo = f"pergunta_{pergunta.id}"
+            valor = request.form.get(campo)
+
+            if valor:
+                resposta = Resposta(
+                    aplicacao_id=aplicacao.id,
+                    pergunta_id=pergunta.id,
+                    valor_resposta=valor
+                )
+                db.session.add(resposta)
+
+        db.session.commit()
+
+        return render_template("publico/sucesso.html")
+
+    return render_template(
+        "publico/responder.html",
+        aplicacao=aplicacao,
+        perguntas=perguntas
+    )
+
+
 # =========================
 # RESULTADO DA APLICAÇÃO
 # =========================
 @main.route("/aplicacoes/<int:id>/resultado")
+@login_required
 def resultado_aplicacao(id):
     aplicacao = Aplicacao.query.get_or_404(id)
 
@@ -652,7 +780,6 @@ def resultado_aplicacao(id):
     ).all()
 
     valores = []
-
     resultado_dimensoes = {}
 
     for resposta in respostas:
@@ -689,9 +816,9 @@ def resultado_aplicacao(id):
         media_geral = round(sum(valores) / len(valores), 2)
 
     if media_geral == 0:
-       classificacao = "Sem dados"
-       descricao_classificacao = "Não há respostas suficientes para gerar uma classificação."
-       recomendacao = "Realizar a aplicação do questionário e coletar respostas válidas."
+        classificacao = "Sem dados"
+        descricao_classificacao = "Não há respostas suficientes para gerar uma classificação."
+        recomendacao = "Realizar a aplicação do questionário e coletar respostas válidas."
     elif media_geral < 2:
         classificacao = "Baixo"
         descricao_classificacao = "Os resultados indicam baixo nível de exposição aos fatores psicossociais avaliados."
@@ -736,23 +863,24 @@ def resultado_aplicacao(id):
     ]
 
     return render_template(
-    "resultados/aplicacao.html",
-    aplicacao=aplicacao,
-    media_geral=media_geral,
-    classificacao=classificacao,
-    descricao_classificacao=descricao_classificacao,
-    recomendacao=recomendacao,
-    linhas_resultado=linhas_resultado,
-    labels_dimensoes=labels_dimensoes,
-    medias_dimensoes=medias_dimensoes
-)
+        "resultados/aplicacao.html",
+        aplicacao=aplicacao,
+        media_geral=media_geral,
+        classificacao=classificacao,
+        descricao_classificacao=descricao_classificacao,
+        recomendacao=recomendacao,
+        linhas_resultado=linhas_resultado,
+        labels_dimensoes=labels_dimensoes,
+        medias_dimensoes=medias_dimensoes
+    )
+
 
 # =========================
 # PDF DO RESULTADO
 # =========================
 @main.route("/aplicacoes/<int:id>/pdf")
+@login_required
 def gerar_pdf_aplicacao(id):
-
     aplicacao = Aplicacao.query.get_or_404(id)
 
     respostas = Resposta.query.filter_by(
@@ -764,7 +892,7 @@ def gerar_pdf_aplicacao(id):
     for resposta in respostas:
         try:
             valores.append(int(resposta.valor_resposta))
-        except:
+        except Exception:
             pass
 
     media_geral = 0
@@ -794,9 +922,7 @@ def gerar_pdf_aplicacao(id):
     )
 
     doc = SimpleDocTemplate(arquivo.name)
-
     estilos = getSampleStyleSheet()
-
     elementos = []
 
     elementos.append(
@@ -867,43 +993,4 @@ def gerar_pdf_aplicacao(id):
         arquivo.name,
         as_attachment=True,
         download_name=f"resultado_aplicacao_{id}.pdf"
-    )
-
-@main.route("/publico/<int:id>", methods=["GET", "POST"])
-def responder_publico(id):
-
-    aplicacao = Aplicacao.query.get_or_404(id)
-
-    perguntas = Pergunta.query.filter_by(
-        questionario_id=aplicacao.questionario_id,
-        status="Ativa"
-    ).order_by(Pergunta.ordem.asc()).all()
-
-    if request.method == "POST":
-
-        for pergunta in perguntas:
-
-            campo = f"pergunta_{pergunta.id}"
-            valor = request.form.get(campo)
-
-            if valor:
-
-                resposta = Resposta(
-                    aplicacao_id=aplicacao.id,
-                    pergunta_id=pergunta.id,
-                    valor_resposta=valor
-                )
-
-                db.session.add(resposta)
-
-        db.session.commit()
-
-        return render_template(
-            "publico/sucesso.html"
-        )
-
-    return render_template(
-        "publico/responder.html",
-        aplicacao=aplicacao,
-        perguntas=perguntas
     )

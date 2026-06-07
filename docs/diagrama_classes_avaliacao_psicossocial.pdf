@@ -1,0 +1,678 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+2 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>
+endobj
+3 0 obj
+<< /Length 9258 >>
+stream
+0.000 0.000 0.000 rg
+BT
+/F2 30 Tf
+506.8 1360.0 Td (Diagrama de Classes - Avaliacao Psicossocial) Tj
+ET
+0.980 0.940 0.630 rg
+40 1055 310 275 re B
+0.920 0.860 0.470 rg
+40 1295 310 35 re B
+0.000 0.000 0.000 RG
+1.5 w
+40 1295 m 350 1295 l S
+0.000 0.000 0.000 rg
+BT
+/F2 22 Tf
+155.0 1305.0 Td (Empresa) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+50.0 1272.0 Td (- PK id : Integer) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+50.0 1252.0 Td (- razao_social : String) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+50.0 1232.0 Td (- nome_fantasia : String) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+50.0 1212.0 Td (- cnpj : String) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+50.0 1192.0 Td (- email : String) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+50.0 1172.0 Td (- telefone : String) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+50.0 1152.0 Td (- responsavel : String) Tj
+ET
+0.000 0.000 0.000 RG
+1.2 w
+40 1140 m 350 1140 l S
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+50.0 1118.0 Td (+ cadastrar\(\)) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+50.0 1098.0 Td (+ editar\(\)) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+50.0 1078.0 Td (+ inativar\(\)) Tj
+ET
+0.980 0.940 0.630 rg
+40 800 310 210 re B
+0.920 0.860 0.470 rg
+40 975 310 35 re B
+0.000 0.000 0.000 RG
+1.5 w
+40 975 m 350 975 l S
+0.000 0.000 0.000 rg
+BT
+/F2 22 Tf
+155.0 985.0 Td (Unidade) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+50.0 952.0 Td (- PK id : Integer) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+50.0 932.0 Td (- FK empresa_id : Integer) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+50.0 912.0 Td (- nome : String) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+50.0 892.0 Td (- descricao : String) Tj
+ET
+0.000 0.000 0.000 RG
+1.2 w
+40 880 m 350 880 l S
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+50.0 858.0 Td (+ cadastrar\(\)) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+50.0 838.0 Td (+ editar\(\)) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+50.0 818.0 Td (+ inativar\(\)) Tj
+ET
+0.980 0.940 0.630 rg
+40 520 310 225 re B
+0.920 0.860 0.470 rg
+40 710 310 35 re B
+0.000 0.000 0.000 RG
+1.5 w
+40 710 m 350 710 l S
+0.000 0.000 0.000 rg
+BT
+/F2 22 Tf
+166.4 720.0 Td (Setor) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+50.0 687.0 Td (- PK id : Integer) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+50.0 667.0 Td (- FK empresa_id : Integer) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+50.0 647.0 Td (- FK unidade_id : Integer) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+50.0 627.0 Td (- nome : String) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+50.0 607.0 Td (- descricao : String) Tj
+ET
+0.000 0.000 0.000 RG
+1.2 w
+40 595 m 350 595 l S
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+50.0 573.0 Td (+ cadastrar\(\)) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+50.0 553.0 Td (+ editar\(\)) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+50.0 533.0 Td (+ inativar\(\)) Tj
+ET
+0.980 0.940 0.630 rg
+40 245 310 225 re B
+0.920 0.860 0.470 rg
+40 435 310 35 re B
+0.000 0.000 0.000 RG
+1.5 w
+40 435 m 350 435 l S
+0.000 0.000 0.000 rg
+BT
+/F2 22 Tf
+166.4 445.0 Td (Cargo) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+50.0 412.0 Td (- PK id : Integer) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+50.0 392.0 Td (- FK empresa_id : Integer) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+50.0 372.0 Td (- FK unidade_id : Integer) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+50.0 352.0 Td (- FK setor_id : Integer) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+50.0 332.0 Td (- nome : String) Tj
+ET
+0.000 0.000 0.000 RG
+1.2 w
+40 320 m 350 320 l S
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+50.0 298.0 Td (+ cadastrar\(\)) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+50.0 278.0 Td (+ editar\(\)) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+50.0 258.0 Td (+ inativar\(\)) Tj
+ET
+0.980 0.940 0.630 rg
+560 1125 330 195 re B
+0.920 0.860 0.470 rg
+560 1285 330 35 re B
+0.000 0.000 0.000 RG
+1.5 w
+560 1285 m 890 1285 l S
+0.000 0.000 0.000 rg
+BT
+/F2 22 Tf
+656.4 1295.0 Td (Questionario) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+570.0 1262.0 Td (- PK id : Integer) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+570.0 1242.0 Td (- nome : String) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+570.0 1222.0 Td (- descricao : String) Tj
+ET
+0.000 0.000 0.000 RG
+1.2 w
+560 1210 m 890 1210 l S
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+570.0 1188.0 Td (+ cadastrar\(\)) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+570.0 1168.0 Td (+ editar\(\)) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+570.0 1148.0 Td (+ inativar\(\)) Tj
+ET
+0.980 0.940 0.630 rg
+560 650 330 255 re B
+0.920 0.860 0.470 rg
+560 870 330 35 re B
+0.000 0.000 0.000 RG
+1.5 w
+560 870 m 890 870 l S
+0.000 0.000 0.000 rg
+BT
+/F2 22 Tf
+679.2 880.0 Td (Pergunta) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+570.0 847.0 Td (- PK id : Integer) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+570.0 827.0 Td (- FK questionario_id : Integer) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+570.0 807.0 Td (- texto : Text) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+570.0 787.0 Td (- tipo_resposta : String) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+570.0 767.0 Td (- obrigatoria : Boolean) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+570.0 747.0 Td (- ordem : Integer) Tj
+ET
+0.000 0.000 0.000 RG
+1.2 w
+560 735 m 890 735 l S
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+570.0 713.0 Td (+ cadastrar\(\)) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+570.0 693.0 Td (+ editar\(\)) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+570.0 673.0 Td (+ inativar\(\)) Tj
+ET
+0.980 0.940 0.630 rg
+1090 800 410 360 re B
+0.920 0.860 0.470 rg
+1090 1125 410 35 re B
+0.000 0.000 0.000 RG
+1.5 w
+1090 1125 m 1500 1125 l S
+0.000 0.000 0.000 rg
+BT
+/F2 22 Tf
+1243.5 1135.0 Td (Aplicacao) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+1100.0 1102.0 Td (- PK id : Integer) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+1100.0 1082.0 Td (- FK questionario_id : Integer) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+1100.0 1062.0 Td (- FK empresa_id : Integer) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+1100.0 1042.0 Td (- FK unidade_id : Integer) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+1100.0 1022.0 Td (- FK setor_id : Integer) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+1100.0 1002.0 Td (- FK cargo_id : Integer) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+1100.0 982.0 Td (- titulo : String) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+1100.0 962.0 Td (- data_inicio : Date) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+1100.0 942.0 Td (- data_fim : Date) Tj
+ET
+0.000 0.000 0.000 RG
+1.2 w
+1090 930 m 1500 930 l S
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+1100.0 908.0 Td (+ criar\(\)) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+1100.0 888.0 Td (+ encerrar\(\)) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+1100.0 868.0 Td (+ gerarLinkPublico\(\)) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+1100.0 848.0 Td (+ gerarResultado\(\)) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+1100.0 828.0 Td (+ gerarPDF\(\)) Tj
+ET
+0.980 0.940 0.630 rg
+1090 400 410 170 re B
+0.920 0.860 0.470 rg
+1090 535 410 35 re B
+0.000 0.000 0.000 RG
+1.5 w
+1090 535 m 1500 535 l S
+0.000 0.000 0.000 rg
+BT
+/F2 22 Tf
+1249.2 545.0 Td (Resposta) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+1100.0 512.0 Td (- PK id : Integer) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+1100.0 492.0 Td (- FK aplicacao_id : Integer) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+1100.0 472.0 Td (- FK pergunta_id : Integer) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+1100.0 452.0 Td (- valor_resposta : Text) Tj
+ET
+0.000 0.000 0.000 RG
+1.2 w
+1090 440 m 1500 440 l S
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+1100.0 418.0 Td (+ salvar\(\)) Tj
+ET
+0.000 0.000 0.000 RG
+2 w
+195 1055 m
+195 1010 l
+S
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+205.8 1045.0 Td (1) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+205.8 1020.0 Td (*) Tj
+ET
+0.000 0.000 0.000 RG
+2 w
+195 800 m
+195 745 l
+S
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+205.8 790.0 Td (1) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+205.8 755.0 Td (*) Tj
+ET
+0.000 0.000 0.000 RG
+2 w
+195 520 m
+195 470 l
+S
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+205.8 510.0 Td (1) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+205.8 480.0 Td (*) Tj
+ET
+0.000 0.000 0.000 RG
+2 w
+725 1125 m
+725 905 l
+S
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+735.8 1110.0 Td (1) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+735.8 920.0 Td (*) Tj
+ET
+0.000 0.000 0.000 RG
+2 w
+890 1220 m
+1015 1220 l
+1015 1120 l
+1090 1120 l
+S
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+900.8 1232.0 Td (1) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+1070.8 1132.0 Td (*) Tj
+ET
+0.000 0.000 0.000 RG
+2 w
+350 1240 m
+460 1240 l
+460 1345 l
+1020 1345 l
+1020 1080 l
+1090 1080 l
+S
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+360.8 1252.0 Td (1) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+1070.8 1092.0 Td (*) Tj
+ET
+0.000 0.000 0.000 RG
+2 w
+350 905 m
+455 905 l
+455 620 l
+1020 620 l
+1020 1020 l
+1090 1020 l
+S
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+360.8 917.0 Td (1) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+1070.8 1032.0 Td (*) Tj
+ET
+0.000 0.000 0.000 RG
+2 w
+350 620 m
+500 620 l
+500 610 l
+1030 610 l
+1030 960 l
+1090 960 l
+S
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+360.8 632.0 Td (1) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+1070.8 972.0 Td (*) Tj
+ET
+0.000 0.000 0.000 RG
+2 w
+350 350 m
+1035 350 l
+1035 900 l
+1090 900 l
+S
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+360.8 362.0 Td (1) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+1070.8 912.0 Td (*) Tj
+ET
+0.000 0.000 0.000 RG
+2 w
+890 760 m
+1025 760 l
+1025 485 l
+1090 485 l
+S
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+900.8 772.0 Td (1) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+1070.8 497.0 Td (*) Tj
+ET
+0.000 0.000 0.000 RG
+2 w
+1295 800 m
+1295 570 l
+S
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+1305.8 785.0 Td (1) Tj
+ET
+0.000 0.000 0.000 rg
+BT
+/F1 16 Tf
+1305.8 585.0 Td (*) Tj
+ET
+endstream
+endobj
+4 0 obj
+<< /Type /Page /Parent 5 0 R /MediaBox [0 0 1700 1400] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 3 0 R >>
+endobj
+5 0 obj
+<< /Type /Pages /Kids [4 0 R] /Count 1 >>
+endobj
+6 0 obj
+<< /Type /Catalog /Pages 5 0 R >>
+endobj
+xref
+0 7
+0000000000 65535 f 
+0000000009 00000 n 
+0000000079 00000 n 
+0000000154 00000 n 
+0000009463 00000 n 
+0000009601 00000 n 
+0000009658 00000 n 
+trailer
+<< /Size 7 /Root 6 0 R >>
+startxref
+9707
+%%EOF
