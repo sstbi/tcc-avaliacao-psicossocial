@@ -10,6 +10,10 @@ def create_app():
     app.config.from_object(Config)
 
     app.config["SECRET_KEY"] = "chave-secreta-tcc-avaliacao-psicossocial"
+    app.config["SESSION_PERMANENT"] = False
+    app.config["SESSION_COOKIE_PERMANENT"] = False
+    app.config["SESSION_COOKIE_HTTPONLY"] = True
+    app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 
     db.init_app(app)
 

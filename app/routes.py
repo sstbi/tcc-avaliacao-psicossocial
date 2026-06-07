@@ -31,6 +31,26 @@ from app.models import (
 
 main = Blueprint("main", __name__)
 
+@main.before_request
+def proteger_rotas():
+    rotas_livres = [
+        "main.login",
+        "main.logout",
+        "main.responder_publico",
+        "static"
+    ]
+
+    if request.endpoint in rotas_livres:
+        return
+
+    if request.endpoint is None:
+        return
+
+    if session.get("usuario_logado") is not True:
+        session.clear()
+        flash("Faça login para acessar o sistema.", "warning")
+        return redirect(url_for("main.login"))
+
 
 # =========================
 # LOGIN / SEGURANÇA
@@ -47,13 +67,19 @@ def login_required(f):
 
 @main.route("/login", methods=["GET", "POST"])
 def login():
+    if session.get("usuario_logado") is True:
+        return redirect(url_for("main.index"))
+
     if request.method == "POST":
         usuario = request.form.get("usuario")
         senha = request.form.get("senha")
 
         if usuario == "admin" and senha == "123456":
+            session.clear()
+            session.permanent = False
             session["usuario_logado"] = True
             session["nome_usuario"] = "Administrador"
+
             flash("Login realizado com sucesso!", "success")
             return redirect(url_for("main.index"))
 

@@ -27,6 +27,11 @@
                         Sistema de Avaliação Psicossocial
                     </p>
 
+                    <div class="alert alert-info">
+                        Acesso restrito. O sistema contém dados sensíveis relacionados
+                        à avaliação psicossocial dos trabalhadores.
+                    </div>
+
                     {% with messages = get_flashed_messages(with_categories=true) %}
                         {% if messages %}
                             {% for category, message in messages %}
@@ -37,13 +42,14 @@
                         {% endif %}
                     {% endwith %}
 
-                    <form method="post">
+                    <form method="post" autocomplete="off">
 
                         <div class="mb-3">
                             <label class="form-label">Usuário</label>
                             <input type="text"
                                    name="usuario"
                                    class="form-control"
+                                   autocomplete="off"
                                    required>
                         </div>
 
@@ -52,6 +58,7 @@
                             <input type="password"
                                    name="senha"
                                    class="form-control"
+                                   autocomplete="new-password"
                                    required>
                         </div>
 
