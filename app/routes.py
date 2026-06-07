@@ -3,6 +3,11 @@ from sqlalchemy import func, cast, Integer
 
 from app import db
 from app.models import Empresa, Unidade, Setor, Cargo, Questionario, Pergunta, Aplicacao, Resposta
+from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, send_file
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+from reportlab.lib.styles import getSampleStyleSheet
+import tempfile
 
 
 main = Blueprint("main", __name__)
@@ -741,3 +746,164 @@ def resultado_aplicacao(id):
     labels_dimensoes=labels_dimensoes,
     medias_dimensoes=medias_dimensoes
 )
+
+# =========================
+# PDF DO RESULTADO
+# =========================
+@main.route("/aplicacoes/<int:id>/pdf")
+def gerar_pdf_aplicacao(id):
+
+    aplicacao = Aplicacao.query.get_or_404(id)
+
+    respostas = Resposta.query.filter_by(
+        aplicacao_id=aplicacao.id
+    ).all()
+
+    valores = []
+
+    for resposta in respostas:
+        try:
+            valores.append(int(resposta.valor_resposta))
+        except:
+            pass
+
+    media_geral = 0
+
+    if valores:
+        media_geral = round(sum(valores) / len(valores), 2)
+
+    if media_geral == 0:
+        classificacao = "Sem dados"
+        recomendacao = "Não há respostas suficientes."
+    elif media_geral < 2:
+        classificacao = "Baixo"
+        recomendacao = "Manter monitoramento periódico."
+    elif media_geral < 3:
+        classificacao = "Moderado"
+        recomendacao = "Avaliar ações preventivas."
+    elif media_geral < 4:
+        classificacao = "Alto"
+        recomendacao = "Realizar análise detalhada."
+    else:
+        classificacao = "Crítico"
+        recomendacao = "Intervenção prioritária."
+
+    arquivo = tempfile.NamedTemporaryFile(
+        delete=False,
+        suffix=".pdf"
+    )
+
+    doc = SimpleDocTemplate(arquivo.name)
+
+    estilos = getSampleStyleSheet()
+
+    elementos = []
+
+    elementos.append(
+        Paragraph(
+            "RELATÓRIO DE AVALIAÇÃO PSICOSSOCIAL",
+            estilos["Title"]
+        )
+    )
+
+    elementos.append(Spacer(1, 20))
+
+    elementos.append(
+        Paragraph(
+            f"<b>Aplicação:</b> {aplicacao.titulo}",
+            estilos["BodyText"]
+        )
+    )
+
+    elementos.append(
+        Paragraph(
+            f"<b>Empresa:</b> {aplicacao.empresa.razao_social}",
+            estilos["BodyText"]
+        )
+    )
+
+    elementos.append(
+        Paragraph(
+            f"<b>Questionário:</b> {aplicacao.questionario.nome}",
+            estilos["BodyText"]
+        )
+    )
+
+    elementos.append(Spacer(1, 20))
+
+    elementos.append(
+        Paragraph(
+            f"<b>Média Geral:</b> {media_geral}",
+            estilos["BodyText"]
+        )
+    )
+
+    elementos.append(
+        Paragraph(
+            f"<b>Classificação:</b> {classificacao}",
+            estilos["BodyText"]
+        )
+    )
+
+    elementos.append(
+        Paragraph(
+            f"<b>Recomendação:</b> {recomendacao}",
+            estilos["BodyText"]
+        )
+    )
+
+    elementos.append(Spacer(1, 20))
+
+    elementos.append(
+        Paragraph(
+            "Observação: Este relatório possui caráter gerencial e não substitui avaliação técnica especializada.",
+            estilos["Italic"]
+        )
+    )
+
+    doc.build(elementos)
+
+    return send_file(
+        arquivo.name,
+        as_attachment=True,
+        download_name=f"resultado_aplicacao_{id}.pdf"
+    )
+
+@main.route("/publico/<int:id>", methods=["GET", "POST"])
+def responder_publico(id):
+
+    aplicacao = Aplicacao.query.get_or_404(id)
+
+    perguntas = Pergunta.query.filter_by(
+        questionario_id=aplicacao.questionario_id,
+        status="Ativa"
+    ).order_by(Pergunta.ordem.asc()).all()
+
+    if request.method == "POST":
+
+        for pergunta in perguntas:
+
+            campo = f"pergunta_{pergunta.id}"
+            valor = request.form.get(campo)
+
+            if valor:
+
+                resposta = Resposta(
+                    aplicacao_id=aplicacao.id,
+                    pergunta_id=pergunta.id,
+                    valor_resposta=valor
+                )
+
+                db.session.add(resposta)
+
+        db.session.commit()
+
+        return render_template(
+            "publico/sucesso.html"
+        )
+
+    return render_template(
+        "publico/responder.html",
+        aplicacao=aplicacao,
+        perguntas=perguntas
+    )

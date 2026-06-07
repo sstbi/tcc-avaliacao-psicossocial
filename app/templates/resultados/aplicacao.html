@@ -138,7 +138,13 @@
     </div>
 </div>
 
-<a href="{{ url_for('main.listar_aplicacoes') }}" class="btn btn-secondary">
+<a href="{{ url_for('main.gerar_pdf_aplicacao', id=aplicacao.id) }}"
+   class="btn btn-success">
+    Gerar PDF
+</a>
+
+<a href="{{ url_for('main.listar_aplicacoes') }}"
+   class="btn btn-secondary">
     Voltar
 </a>
 

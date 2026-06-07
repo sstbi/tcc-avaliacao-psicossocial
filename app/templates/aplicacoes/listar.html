@@ -53,6 +53,12 @@
                    Resultado
                 </a>
 
+                <a href="{{ url_for('main.responder_publico', id=aplicacao.id) }}"
+                   target="_blank"
+                   class="btn btn-sm btn-secondary">
+                   Link Público
+                </a>
+
                 {% if aplicacao.status != 'Encerrada' %}
                 <form action="{{ url_for('main.encerrar_aplicacao', id=aplicacao.id) }}"
                       method="post"
